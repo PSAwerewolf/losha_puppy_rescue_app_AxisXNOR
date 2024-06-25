@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:losha_puppy_rescue_app/main.dart';
 
-class home extends StatelessWidget {
-  String firstName, lastName, email, address;
-  String phoneNumber;
+class HomePage extends StatelessWidget {
+  String firstName, lastName, email, address, phoneNumber;
 
-  home(
+  HomePage(
       {required this.firstName,
       required this.lastName,
       required this.email,
@@ -16,6 +16,11 @@ class home extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.orange,
+        leading: BackButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         centerTitle: true,
         title: Text('Home Page',
             style: TextStyle(
@@ -115,6 +120,29 @@ class home extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                   color: Colors.grey[700],
                 ),
+              ),
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.all(15),
+                    backgroundColor: Colors.deepOrangeAccent,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0)),
+                    minimumSize:
+                        const Size(double.maxFinite, double.minPositive)),
+                child: const Text(
+                  'Login',
+                  style: TextStyle(fontSize: 25, color: Colors.white),
+                ),
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => MyApp()));
+                },
               ),
             ),
           ],

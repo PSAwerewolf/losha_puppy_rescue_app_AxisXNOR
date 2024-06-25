@@ -3,22 +3,38 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:losha_puppy_rescue_app/home.dart';
+import 'package:losha_puppy_rescue_app/adminpage.dart';
 import 'package:losha_puppy_rescue_app/main.dart';
 import 'package:http/http.dart' as http;
 
-final _formKeySignup = GlobalKey<FormState>();
+final _formKeyUpdate = GlobalKey<FormState>();
 
-class SignUp extends StatefulWidget {
-  const SignUp({Key? key}) : super(key: key);
+class UpdateUser extends StatefulWidget {
+  final String ID;
+  final String fname;
+  final String lname;
+  final String phoneNumber;
+  final String address;
+  final String volExp;
+  final String email;
+
+  const UpdateUser(
+      {super.key,
+      this.ID = '',
+      this.fname = '',
+      this.lname = '',
+      this.phoneNumber = '',
+      this.address = '',
+      this.volExp = '',
+      this.email = ''});
 
   @override
-  State<SignUp> createState() => _SignUpState();
+  State<UpdateUser> createState() => _UpdateUserState();
 }
 
-class _SignUpState extends State<SignUp> {
+class _UpdateUserState extends State<UpdateUser> {
   String? validateEmail(String? email) {
-    RegExp emailRegexp = RegExp(r'^[\w\.-]+@[\w-]+\.\w{2,3}(\.\w{2,3})?$');
+    RegExp emailRegexp = RegExp(r'^[\w.-]+@[\w-]+\.\w{2,3}(\.\w{2,3})?$');
     final isEmailValid = emailRegexp.hasMatch(email ?? '');
     if (!isEmailValid) {
       return 'Please Enter a Valid Email';
@@ -44,8 +60,21 @@ class _SignUpState extends State<SignUp> {
   TextEditingController _password = TextEditingController();
   TextEditingController _cpassword = TextEditingController();
   TextEditingController _phoneNumber = TextEditingController();
+  TextEditingController _volExp = TextEditingController();
 
-  Future _saveDetails(
+  // void dispose() {
+  // _fName.dispose();
+  //_fName.dispose();
+  //_lName.dispose();
+  //_address.dispose();
+  //_email.dispose();
+  //_password.dispose();
+  //_cpassword.dispose();
+  //_phoneNumber.dispose();
+  //super.dispose();
+  //}
+
+  Future _updateDetails(
       String fname,
       String lname,
       String email,
@@ -53,10 +82,7 @@ class _SignUpState extends State<SignUp> {
       String address,
       String password,
       String volExp) async {
-    var url = Uri.parse("http://192.168.1.101/Flutter_demoApp/signup.php");
-
-    //var pic = await http.MultipartFile.fromPath("Image", _selectedImage.path);
-
+    var url = Uri.parse("http://192.168.1.101/Flutter_demoApp/updateuser.php");
     final response = await http.post(url, body: {
       "FirstName": fname,
       "LastName": lname,
@@ -64,16 +90,45 @@ class _SignUpState extends State<SignUp> {
       "Address": address,
       "PhoneNumber": phoneNumber,
       "Password": password,
-      "Volunteer_Exp": volExp
+      "Volunteer_Exp": volExp,
+      "ID": widget.ID
     });
 
     var res = response.body;
-
-    if (res == "true") {
-      Navigator.pop(context);
+    Navigator.pop(
+        context, MaterialPageRoute(builder: (context) => AdminPage()));
+    if (res == true) {
+      Navigator.pop(
+          context, MaterialPageRoute(builder: (context) => AdminPage()));
     } else {
       print("Error :" + res);
     }
+  }
+
+  Future _deleteUser() async {
+    var url = Uri.parse("http://192.168.1.101/Flutter_demoApp/deleteuser.php");
+    final response = await http.post(url, body: {"ID": widget.ID});
+
+    var res = response.body;
+    print(res);
+    Navigator.pop(
+        context, MaterialPageRoute(builder: (context) => AdminPage()));
+    if (res == true) {
+    } else {
+      print("Error :" + res);
+    }
+  }
+
+  @override
+  void initState() {
+    _fName.text = widget.fname;
+    _lName.text = widget.lname;
+    _phoneNumber.text = widget.phoneNumber;
+    _address.text = widget.address;
+    _email.text = widget.email;
+    _volExp.text = widget.volExp;
+
+    super.initState();
   }
 
   @override
@@ -86,12 +141,14 @@ class _SignUpState extends State<SignUp> {
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const MyApp()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AdminPage()));
                 },
               ),
               title: const Text(
-                'Sign up',
+                'Update User',
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
@@ -101,7 +158,7 @@ class _SignUpState extends State<SignUp> {
             child: Padding(
               padding: const EdgeInsets.all(25.0),
               child: Form(
-                key: _formKeySignup,
+                key: _formKeyUpdate,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -157,7 +214,7 @@ class _SignUpState extends State<SignUp> {
                                 borderRadius: BorderRadius.circular(10.0),
                                 borderSide: const BorderSide(
                                     color: Colors.orange, width: 2))),
-                        validator: (fname) => fname!.length < 3
+                        validator: (name) => name!.length < 3
                             ? 'Enter Name atleast 3 Character'
                             : null,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -178,7 +235,7 @@ class _SignUpState extends State<SignUp> {
                                 borderRadius: BorderRadius.circular(10.0),
                                 borderSide: const BorderSide(
                                     color: Colors.orange, width: 2))),
-                        validator: (lname) => lname!.length < 3
+                        validator: (name) => name!.length < 3
                             ? 'Enter Name atleast 3 Character'
                             : null,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -199,7 +256,7 @@ class _SignUpState extends State<SignUp> {
                                 borderRadius: BorderRadius.circular(10.0),
                                 borderSide: const BorderSide(
                                     color: Colors.orange, width: 2))),
-                        validator: (address) => address!.length < 3
+                        validator: (name) => name!.length < 3
                             ? 'Enter Name atleast 3 Character'
                             : null,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -400,7 +457,7 @@ class _SignUpState extends State<SignUp> {
                             minimumSize: const Size(
                                 double.maxFinite, double.minPositive)),
                         child: const Text(
-                          'Sign up',
+                          'Update Details',
                           style: TextStyle(fontSize: 25, color: Colors.white),
                         ),
                         onPressed: () {
@@ -412,10 +469,6 @@ class _SignUpState extends State<SignUp> {
                           var confirmPassword = _cpassword.text;
                           var pNumber = _phoneNumber.text;
                           var volExp = _selectedValue.toString();
-                          //var image = _selectedImage;
-
-                          print(password);
-                          print(confirmPassword);
 
                           if ((firstName.isNotEmpty ||
                                   lastName.isNotEmpty ||
@@ -424,20 +477,30 @@ class _SignUpState extends State<SignUp> {
                                   password.isNotEmpty ||
                                   confirmPassword.isNotEmpty) &&
                               (password == confirmPassword)) {
-                            _saveDetails(firstName, lastName, email, pNumber,
+                            _updateDetails(firstName, lastName, email, pNumber,
                                 address, password, volExp);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => HomePage(
-                                        firstName: firstName,
-                                        lastName: lastName,
-                                        email: email,
-                                        address: address,
-                                        phoneNumber: pNumber)));
                           }
                         },
                       ),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.all(15),
+                              backgroundColor: Colors.red,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0)),
+                              minimumSize: const Size(
+                                  double.maxFinite, double.minPositive)),
+                          child: const Text(
+                            'Delete User',
+                            style: TextStyle(fontSize: 25, color: Colors.white),
+                          ),
+                          onPressed: () {
+                            _deleteUser();
+                          }),
                     ),
                   ],
                 ),

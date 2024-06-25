@@ -1,7 +1,11 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:email_auth/email_auth.dart';
+import 'package:http/http.dart' as http;
 
-final _formKey = GlobalKey<FormState>();
+final _formKey2 = GlobalKey<FormState>();
 
 class forgotPassword extends StatefulWidget {
   const forgotPassword({Key? key}) : super(key: key);
@@ -11,11 +15,11 @@ class forgotPassword extends StatefulWidget {
 }
 
 class _forgotPasswordState extends State<forgotPassword> {
-  TextEditingController _email = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
   TextEditingController _otpController = TextEditingController();
 
   String? validateEmail(String? email) {
-    RegExp emailRegexp = RegExp(r'^[\w\.-]+@[\w-]+\.\w{2,3}(\.\w{2,3})?$');
+    RegExp emailRegexp = RegExp(r'^[\w.-]+@[\w-]+\.\w{2,3}(\.\w{2,3})?$');
     final isEmailValid = emailRegexp.hasMatch(email ?? '');
     if (!isEmailValid) {
       return 'Please Enter a Valid Email';
@@ -23,23 +27,43 @@ class _forgotPasswordState extends State<forgotPassword> {
     return null;
   }
 
+  Future<String> _forgotEmailChecker(String email) async {
+    var url =
+        Uri.parse("http://192.168.1.101/Flutter_demoApp/forgotPassword.php");
+
+    final response = await http.post(url, body: {'Email': email});
+    var dataReceived = await json.decode(response.body);
+
+    String dataResStatus = dataReceived['status'];
+    return dataResStatus;
+  }
+
+  EmailAuth emailAuth = new EmailAuth(sessionName: "Sample session");
   void sendOTP() async {
-    EmailAuth.sessionName = "Test Session";
-    var res = await EmailAuth.sendOtp(receiverMail: _email.text);
+    var res = await emailAuth.sendOtp(
+        recipientMail: _emailController.text, otpLength: 4);
     if (res) {
-      print("OTP Sent");
-    } else {
-      print("Error Sending OTP");
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text(
+          'OTP Sent Successfully',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.deepOrange,
+      ));
     }
   }
 
   void verifyOTP() async {
-    var res = await EmailAuth.validate(
-        receiverMail: _email.text, userOTP: _otpController.text);
+    var res = await emailAuth.validateOtp(
+        recipientMail: _emailController.text, userOtp: _otpController.text);
     if (res) {
-      print("OTP VALIDATED");
-    } else {
-      print("OTP Not Valid");
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text(
+          'OTP Confirmed',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.deepOrange,
+      ));
     }
   }
 
@@ -59,7 +83,7 @@ class _forgotPasswordState extends State<forgotPassword> {
         child: Padding(
           padding: const EdgeInsets.all(15.0),
           child: Form(
-            key: _formKey,
+            key: _formKey2,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -78,7 +102,7 @@ class _forgotPasswordState extends State<forgotPassword> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 15.0, horizontal: 0),
                   child: TextFormField(
-                    controller: _email,
+                    controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                         hintText: "Enter Email Address",
@@ -108,11 +132,27 @@ class _forgotPasswordState extends State<forgotPassword> {
                       minimumSize:
                           const Size(double.infinity, double.minPositive),
                       backgroundColor: Colors.deepOrangeAccent),
-                  onPressed: () => sendOTP(),
+                  onPressed: () async {
+                    String emailState =
+                        await _forgotEmailChecker(_emailController.text);
+                    print(emailState);
+                    if (emailState == 'Success') {
+                      sendOTP();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text(
+                          'Account Not Found',
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                        backgroundColor: Colors.deepOrange,
+                      ));
+                    }
+                  },
                   child: const Padding(
                     padding: EdgeInsets.all(10.0),
                     child: Text(
-                      'Check Account',
+                      'Send OTP',
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,

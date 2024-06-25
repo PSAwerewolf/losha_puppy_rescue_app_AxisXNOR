@@ -14,7 +14,8 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   image_picker: ^0.8.6
-  email_auth: ^0.0.1
+  email_auth: ^2.0.0
+  http:
 
 dev_dependencies:
   flutter_test:
