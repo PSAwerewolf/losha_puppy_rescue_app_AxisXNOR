@@ -53,7 +53,7 @@ class _SignUpState extends State<SignUp> {
       String address,
       String password,
       String volExp) async {
-    var url = Uri.parse("http://192.168.1.101/Flutter_demoApp/signup.php");
+    var url = Uri.parse("http://$ipAddress/Flutter_demoApp/signup.php");
 
     //var pic = await http.MultipartFile.fromPath("Image", _selectedImage.path);
 

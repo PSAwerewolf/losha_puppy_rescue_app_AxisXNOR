@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:losha_puppy_rescue_app/SignUp.dart';
+import 'package:losha_puppy_rescue_app/main.dart';
 import 'package:losha_puppy_rescue_app/updateUser.dart';
 
 class AdminPage extends StatefulWidget {
@@ -99,7 +100,7 @@ class ItemList extends StatelessWidget {
 }
 
 Future<List> getData() async {
-  var url = Uri.parse("http://192.168.1.101/Flutter_demoApp/getAllData.php");
+  var url = Uri.parse("http://$ipAddress/Flutter_demoApp/getAllData.php");
   final response = await http.get(url);
   var dataReceived = json.decode(response.body);
   return dataReceived;

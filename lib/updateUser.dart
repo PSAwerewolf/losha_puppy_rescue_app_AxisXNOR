@@ -82,7 +82,7 @@ class _UpdateUserState extends State<UpdateUser> {
       String address,
       String password,
       String volExp) async {
-    var url = Uri.parse("http://192.168.1.101/Flutter_demoApp/updateuser.php");
+    var url = Uri.parse("http://$ipAddress/Flutter_demoApp/updateuser.php");
     final response = await http.post(url, body: {
       "FirstName": fname,
       "LastName": lname,
@@ -106,7 +106,7 @@ class _UpdateUserState extends State<UpdateUser> {
   }
 
   Future _deleteUser() async {
-    var url = Uri.parse("http://192.168.1.101/Flutter_demoApp/deleteuser.php");
+    var url = Uri.parse("http://$ipAddress/Flutter_demoApp/deleteuser.php");
     final response = await http.post(url, body: {"ID": widget.ID});
 
     var res = response.body;

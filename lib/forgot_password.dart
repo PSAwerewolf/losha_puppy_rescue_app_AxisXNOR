@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:email_auth/email_auth.dart';
 import 'package:http/http.dart' as http;
+import 'package:losha_puppy_rescue_app/main.dart';
 
 final _formKey2 = GlobalKey<FormState>();
 
@@ -28,8 +29,7 @@ class _forgotPasswordState extends State<forgotPassword> {
   }
 
   Future<String> _forgotEmailChecker(String email) async {
-    var url =
-        Uri.parse("http://192.168.1.101/Flutter_demoApp/forgotPassword.php");
+    var url = Uri.parse("http://$ipAddress/Flutter_demoApp/forgotPassword.php");
 
     final response = await http.post(url, body: {'Email': email});
     var dataReceived = await json.decode(response.body);
